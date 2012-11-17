@@ -1,0 +1,11 @@
+production:
+  method: local
+
+development:
+  method: daarmaan
+  host: "http://localhost:9000"
+  login_url: "/"
+  login_page: "/"
+  service_name: "nersi"
+  service_key: "123456"
+

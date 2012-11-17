@@ -9,8 +9,34 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
+module Rack
+  module Daarmaan
+    
+    class Auth
+      
+      def initialize app
+        @app = app
+      end 
+
+      def call env
+        status, headers, body = @app.call(env)
+        response = Rack::Response.new(
+                                      body,
+                                      status,
+                                      headers
+                                      )
+        response.finish
+        return response.to_a
+      end
+
+    end
+  end
+end
+
 module RedmineApp
   class Application < Rails::Application
+
+    config.secret_token = "some secret phrase of at least 30 characters"
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -55,5 +81,17 @@ module RedmineApp
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
     end
+
+    if File.exists?(File.join(Rails.root, 'config/authentication.yml'))
+      kwargs = YAML.load_file(File.join(Rails.root,
+                                        'config/authentication.yml'))[Rails.env]
+
+      config.send("auth_config=", kwargs)
+    else
+      raise Errno::ENOENT, "'authentication.yml' does not exists!"
+    end
+
+    #config.middleware.use Rack::Daarmaan::Auth
+
   end
 end

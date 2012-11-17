@@ -20,6 +20,44 @@ require 'cgi'
 
 class Unauthorized < Exception; end
 
+module Daarmaan
+  
+  class Server
+    
+    def initialize kwargs={}
+      if !kwargs.empty?
+        @host = kwargs["host"] or raise ArgumentError, "specify `host`"
+        @host.chomp!("/")
+
+        @service = kwargs["service_name"] or raise ArgumentError, "specify `service_name`"
+        @key = kwargs["service_key"] or raise ArgumentError, "specify `service_key`"
+
+        @login_url = kwargs.has_key?("login_url") ? kwargs["login_url"] : "/"
+        @login_page = kwargs.has_key?("login_page") ? kwargs["login_page"] : "/"
+
+        @initialized = true
+      else
+        @initialized = false
+      end
+    end
+
+    def login_page next_url=nil
+      params = "/?service=#{@service}"
+      if next_url
+        params = "#{params}&next=" + URI.escape(next_url)
+      end
+      login_url = @login_page.chomp("/")
+      "#{@host}#{login_url}#{params}"
+    end
+
+    def is_used?
+      @initialized
+    end
+
+  end
+
+end
+
 class ApplicationController < ActionController::Base
   include Redmine::I18n
   
@@ -35,7 +73,7 @@ class ApplicationController < ActionController::Base
     cookies.delete(:autologin)
   end
 
-  before_filter :session_expiration, :user_setup, :check_if_login_required, :set_localization
+  before_filter :daarmaan_setup, :session_expiration, :user_setup, :check_if_login_required, :set_localization
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :invalid_authenticity_token
   rescue_from ::Unauthorized, :with => :deny_access
@@ -45,12 +83,27 @@ class ApplicationController < ActionController::Base
   include Redmine::MenuManager::MenuController
   helper Redmine::MenuManager::MenuHelper
 
+
+  def daarmaan_setup
+    if Rails.application.config.auth_config["method"] == "daarmaan"
+      @daarmaan = Daarmaan::Server.new Rails.application.config.auth_config
+    else
+      @daarmaan = Daarmaan::Server.new 
+    end
+  end
+
   def session_expiration
+
     if session[:user_id]
       if session_expired? && !try_to_autologin
         reset_session
         flash[:error] = l(:error_session_expired)
-        redirect_to signin_url
+        if @daarmaan.is_used?
+          redirect_to @daarmaan.login_form
+        else
+          redirect_to signin_url
+        end
+
       else
         session[:atime] = Time.now.utc.to_i
       end
@@ -93,13 +146,17 @@ class ApplicationController < ActionController::Base
       if session[:user_id] 
         # existing session
         user = (User.active.find(session[:user_id]) rescue nil)
+
       elsif autologin_user = try_to_autologin
         user = autologin_user
+
       elsif params[:format] == 'atom' && params[:key] && request.get? && accept_rss_auth?
         # RSS key authentication does not start a session
         user = User.find_by_rss_key(params[:key])
       end
+
     end
+
     if user.nil? && Setting.rest_api_enabled? && accept_api_auth?
       if (key = api_key_from_request)
         # Use API key
@@ -110,6 +167,7 @@ class ApplicationController < ActionController::Base
           user = User.try_to_login(username, password) || User.find_by_api_key(username)
         end
       end
+
     end
     user
   end
@@ -177,6 +235,13 @@ class ApplicationController < ActionController::Base
       else
         url = url_for(:controller => params[:controller], :action => params[:action], :id => params[:id], :project_id => params[:project_id])
       end
+
+      if @daarmaan.is_used?
+        # Path url as back_url
+        redirect_to @daarmaan.login_page(url)
+        return false
+      end
+
       respond_to do |format|
         format.html { redirect_to :controller => "account", :action => "login", :back_url => url }
         format.atom { redirect_to :controller => "account", :action => "login", :back_url => url }
