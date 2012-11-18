@@ -20,43 +20,6 @@ require 'cgi'
 
 class Unauthorized < Exception; end
 
-module Daarmaan
-  
-  class Server
-    
-    def initialize kwargs={}
-      if !kwargs.empty?
-        @host = kwargs["host"] or raise ArgumentError, "specify `host`"
-        @host.chomp!("/")
-
-        @service = kwargs["service_name"] or raise ArgumentError, "specify `service_name`"
-        @key = kwargs["service_key"] or raise ArgumentError, "specify `service_key`"
-
-        @login_url = kwargs.has_key?("login_url") ? kwargs["login_url"] : "/"
-        @login_page = kwargs.has_key?("login_page") ? kwargs["login_page"] : "/"
-
-        @initialized = true
-      else
-        @initialized = false
-      end
-    end
-
-    def login_page next_url=nil
-      params = "/?service=#{@service}"
-      if next_url
-        params = "#{params}&next=" + URI.escape(next_url)
-      end
-      login_url = @login_page.chomp("/")
-      "#{@host}#{login_url}#{params}"
-    end
-
-    def is_used?
-      @initialized
-    end
-
-  end
-
-end
 
 class ApplicationController < ActionController::Base
   include Redmine::I18n
@@ -73,7 +36,7 @@ class ApplicationController < ActionController::Base
     cookies.delete(:autologin)
   end
 
-  before_filter :daarmaan_setup, :session_expiration, :user_setup, :check_if_login_required, :set_localization
+  before_filter :session_expiration, :user_setup, :check_if_login_required, :set_localization
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :invalid_authenticity_token
   rescue_from ::Unauthorized, :with => :deny_access
@@ -83,17 +46,9 @@ class ApplicationController < ActionController::Base
   include Redmine::MenuManager::MenuController
   helper Redmine::MenuManager::MenuHelper
 
-
-  def daarmaan_setup
-    if Rails.application.config.auth_config["method"] == "daarmaan"
-      @daarmaan = Daarmaan::Server.new Rails.application.config.auth_config
-    else
-      @daarmaan = Daarmaan::Server.new 
-    end
-  end
-
   def session_expiration
-
+    puts ">>>>>>>>>>>>>>>>>>>>>>>>", session[:daarmaan], ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    @Daarmaan = session[:daarmaan]
     if session[:user_id]
       if session_expired? && !try_to_autologin
         reset_session

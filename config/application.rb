@@ -1,6 +1,8 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require_relative '../lib/daarmaan'
+
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -9,29 +11,6 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
-module Rack
-  module Daarmaan
-    
-    class Auth
-      
-      def initialize app
-        @app = app
-      end 
-
-      def call env
-        status, headers, body = @app.call(env)
-        response = Rack::Response.new(
-                                      body,
-                                      status,
-                                      headers
-                                      )
-        response.finish
-        return response.to_a
-      end
-
-    end
-  end
-end
 
 module RedmineApp
   class Application < Rails::Application
@@ -91,7 +70,7 @@ module RedmineApp
       raise Errno::ENOENT, "'authentication.yml' does not exists!"
     end
 
-    #config.middleware.use Rack::Daarmaan::Auth
+    config.middleware.use Daarmaan::AuthMiddleware
 
   end
 end
