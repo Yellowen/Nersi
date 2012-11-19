@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 
 require 'uri'
+require 'cgi'
 
 
 module Daarmaan
@@ -53,6 +54,7 @@ module Daarmaan
           # User not authenticated
           params.delete("ack")
           uri.query = URI.encode_www_form(params)
+          session["answered"] = true
         end
 
         if ticket
@@ -65,19 +67,31 @@ module Daarmaan
         # Post request should be checked after logging user in or with
         # ticket and ack
       end
-      
-      if session.has_key? "redirected"
-      else
-      end
-      
-      status, headers, body = @app.call(env)
 
+      status, headers, body = @app.call(env)
+      
       response = Rack::Response.new(body, status,
                                     headers)
+      
+      if !session.has_key? "redirected"
+        if session.has_key? "answered"
+          url = uri.to_s
+          if params.empty?
+            url = url[0..-2]
+          end
+          response.redirect(url, 301)
+          session["redirected"] = true
+          session.delete("answered")
+        else
+          response.redirect(@daarmaan.login_url(uri.to_s), 301)
+        end
 
-      response.redirect(@daarmaan.login_url(uri.to_s), 301)
+      else
+        session.delete("redirected")
+      end
+
       response.finish
-      #return response.to_a
+      return response.to_a
     end
     
     private
@@ -118,7 +132,7 @@ module Daarmaan
     def login_page next_url=nil
       params = "/?service=#{@service}"
       if next_url
-        params = "#{params}&next=" + URI.escape(next_url)
+        params = "#{params}&next=" + CGI.escape(next_url)
       end
       login_url = @login_page.chomp("/")
       "#{@host}#{login_url}#{params}"
@@ -127,7 +141,7 @@ module Daarmaan
     def login_url next_url=nil
       params = "/?service=#{@service}"
       if next_url
-        params = "#{params}&next_url=" + URI.escape(next_url)
+        params = "#{params}&next_url=" + CGI.escape(next_url)
       end
       login_url = @login_url.chomp("/")
       "#{@host}#{login_url}#{params}"
