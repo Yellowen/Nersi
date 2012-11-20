@@ -141,7 +141,7 @@ module Daarmaan
     def login_url next_url=nil
       params = "/?service=#{@service}"
       if next_url
-        params = "#{params}&next_url=" + CGI.escape(next_url)
+        params = "#{params}&next=" + CGI.escape(next_url)
       end
       login_url = @login_url.chomp("/")
       "#{@host}#{login_url}#{params}"
