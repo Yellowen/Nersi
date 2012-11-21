@@ -20,10 +20,40 @@
 
 require 'uri'
 require 'cgi'
+require 'digest/sha1'
 
 
 module Daarmaan
-  
+
+  # Default data signing class using hmac algorithm
+  class HmacValidation
+    
+    def initialize key
+      @key = key
+
+    end
+    
+    # Check the validation of given data and hash
+    def is_valid? data, hash
+      my_hash = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'),
+                                     @key, data)
+      hash == my_hash
+    end
+
+    # Sign the data with default or given key, and return the hash
+    def sign data, key=nil
+      k = @key
+      if key
+        k = key
+      end
+
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'),
+                                     k, data)
+    end
+  end
+
+  DefaultValidation = HmacValidation
+
   # Rack middleware for daarmaan base authentication
   class AuthMiddleware
     
@@ -32,24 +62,34 @@ module Daarmaan
 
       # Read the authentication configuration
       daarmaan_setup
+      @validator = DefaultValidation.new @daarmaan.key
     end 
     
     def call env
 
+      # Setup session object using already setuped middlewares
       session = env["rack.session"]
+
       if !session.has_key? :daarmaan
         # Setup the daarmaan object inside session object
         session[:daarmaan] = @daarmaan
+
       end
 
+      # Create a Rack Request
       request = Rack::Request.new(env)
       params = request.params
       uri = URI(request.url)
 
+
       if request.get?
+        # In the case of GET request
+
+        # Get the possible ticket, ack and hash parameter
         ticket = params["ticket"]
         ack = params["ack"]
-        
+        hash = params["hash"]
+
         if ack
           # User not authenticated
           params.delete("ack")
@@ -60,7 +100,32 @@ module Daarmaan
         if ticket
           # user is authenticated in Daarmaan
           params.delete("ticket")
+          params.delete("hash")
           uri.query = URI.encode_www_form(params)
+          if hash and @validator.is_valid? ticket, hash
+            session[:session_id] = ticket
+            user_data = validate(ticket)
+            
+            first_name = user_data["first_name"]
+            if first_name.empty?
+              first_name = "unknown"
+            end
+
+            last_name = user_data["last_name"]
+            if last_name.empty?
+              last_name = "unknown"
+            end
+
+            email = user_data["email"]
+            user = User.where(:login => user_data["username"]).first_or_create!(firstname: first_name,
+                                                                                lastname: last_name,
+                                                                                mail: user_data["email"])
+
+            session["answered"] = true
+            session[:user_id] = user.id
+            session[:user] = user
+          end
+
         end
 
       else
@@ -105,12 +170,50 @@ module Daarmaan
       end
     end
     
+    def validate ticket
+      url = URI("#{@daarmaan.host}/verification/")
+      hash = @validator.sign(ticket)
+
+      params = {
+        token: ticket,
+        hash: hash,
+        service: @daarmaan.service
+      }
+
+      url.query = URI.encode_www_form(params)
+      begin
+        res = Net::HTTP.get_response(url)
+      rescue Errno::ECONNRESET
+        # TODO: handle this situation
+      end
+
+      if res.code == "200"
+        json_data = JSON::load res.body
+        if json_data.has_key? "hash"
+          hash = json_data["hash"]
+          data = json_data["data"]
+          
+          if @validator.is_valid? data["username"], hash
+            return data
+          else
+            return nil
+          end
+        end
+      else
+        # TODO: Find the best way to deal with unreachablity
+        # of Daarmaan
+        # TODO: Add log here
+      end
+
+    end
   end
 
 
   # This class represent the Daarmaan authentication server
   class Server
-    
+
+    attr_reader :key, :host, :service
+
     def initialize kwargs={}
       if !kwargs.empty?
         @host = kwargs["host"] or raise ArgumentError, "specify `host`"

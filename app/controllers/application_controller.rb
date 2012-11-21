@@ -47,8 +47,7 @@ class ApplicationController < ActionController::Base
   helper Redmine::MenuManager::MenuHelper
 
   def session_expiration
-    puts ">>>>>>>>>>>>>>>>>>>>>>>>", session[:daarmaan], ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    @Daarmaan = session[:daarmaan]
+    @daarmaan = session[:daarmaan]
     if session[:user_id]
       if session_expired? && !try_to_autologin
         reset_session
