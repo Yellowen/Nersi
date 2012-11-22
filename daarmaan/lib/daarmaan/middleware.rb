@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Nersi - project management software
+# Daarmaan - Ruby implementation of Daarmaan SSO client
 # Copyright (C) 2012  Yellowen Inc
 #
 # This program is free software; you can redistribute it and/or
@@ -19,38 +19,10 @@
 # -----------------------------------------------------------------------------
 
 require 'uri'
-require 'cgi'
-require 'digest/sha1'
 
+require 'daarmaan/validators'
 
 module Daarmaan
-
-  # Default data signing class using hmac algorithm
-  class HmacValidation
-    
-    def initialize key
-      @key = key
-
-    end
-    
-    # Check the validation of given data and hash
-    def is_valid? data, hash
-      my_hash = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'),
-                                     @key, data)
-      hash == my_hash
-    end
-
-    # Sign the data with default or given key, and return the hash
-    def sign data, key=nil
-      k = @key
-      if key
-        k = key
-      end
-
-      OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha1'),
-                                     k, data)
-    end
-  end
 
   DefaultValidation = HmacValidation
 
@@ -208,51 +180,4 @@ module Daarmaan
     end
   end
 
-
-  # This class represent the Daarmaan authentication server
-  class Server
-
-    attr_reader :key, :host, :service
-
-    def initialize kwargs={}
-      if !kwargs.empty?
-        @host = kwargs["host"] or raise ArgumentError, "specify `host`"
-        @host.chomp!("/")
-
-        @service = kwargs["service_name"] or raise ArgumentError, "specify `service_name`"
-        @key = kwargs["service_key"] or raise ArgumentError, "specify `service_key`"
-
-        @login_url = kwargs.has_key?("login_url") ? kwargs["login_url"] : "/"
-        @login_page = kwargs.has_key?("login_page") ? kwargs["login_page"] : "/"
-
-        @initialized = true
-      else
-        @initialized = false
-      end
-    end
-
-
-    def login_page next_url=nil
-      params = "/?service=#{@service}"
-      if next_url
-        params = "#{params}&next=" + CGI.escape(next_url)
-      end
-      login_url = @login_page.chomp("/")
-      "#{@host}#{login_url}#{params}"
-    end
-
-    def login_url next_url=nil
-      params = "/?service=#{@service}"
-      if next_url
-        params = "#{params}&next=" + CGI.escape(next_url)
-      end
-      login_url = @login_url.chomp("/")
-      "#{@host}#{login_url}#{params}"
-    end
-
-    def is_used?
-      @initialized
-    end
-
-  end
 end
