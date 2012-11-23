@@ -1,7 +1,9 @@
+$LOAD_PATH.unshift("/home/lxsameer/src/redmine/daarmaan/lib/")
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 require 'daarmaan'
+
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line

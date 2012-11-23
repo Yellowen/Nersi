@@ -21,6 +21,11 @@
 require 'daarmaan/middleware'
 require 'daarmaan/server'
 require 'daarmaan/validators'
+require 'daarmaan/controllers'
 
 module Daarmaan
+
+  class NoDaarmaanMiddleware < StandardError
+  end
+
 end

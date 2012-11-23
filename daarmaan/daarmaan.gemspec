@@ -5,13 +5,13 @@ require "daarmaan/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "daarmaan"
+  s.name        = "Daarmaan"
   s.version     = Daarmaan::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Daarmaan."
-  s.description = "TODO: Description of Daarmaan."
+  s.authors     = ["Sameer Rahmani"]
+  s.email       = ["lxsameer@gnu.org"]
+  s.homepage    = "http://daarmaan.yellowen.com"
+  s.summary     = "Ruby implementation of Daarmaan client."
+  s.description = "Ruby implementation of Daarmaan client."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
