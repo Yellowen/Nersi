@@ -1,9 +1,9 @@
 module Redmine
   module Info
     class << self
-      def app_name; 'Redmine' end
-      def url; 'http://www.redmine.org/' end
-      def help_url; 'http://www.redmine.org/guide' end
+      def app_name; 'Nersi' end
+      def url; 'http://nersi.yellowen.com/' end
+      def help_url; 'http://nersi.yellowen.com/guide' end
       def versioned_name; "#{app_name} #{Redmine::VERSION}" end
 
       def environment
