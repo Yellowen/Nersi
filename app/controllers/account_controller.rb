@@ -24,10 +24,18 @@ class AccountController < ApplicationController
 
   # Login request and validation
   def login
-    if request.get?
-      logout_user
+    if @daarmaan.is_used?
+      if User.current.logged?
+        redirect_to home_url
+      else
+        redirect_to @daarmaan.login_page(request.referer)
+      end
     else
-      authenticate_user
+      if request.get?
+        logout_user
+      else
+        authenticate_user
+      end
     end
   rescue AuthSourceException => e
     logger.error "An error occured when authenticating #{params[:username]}: #{e.message}"
@@ -36,8 +44,17 @@ class AccountController < ApplicationController
 
   # Log out current user and redirect to welcome page
   def logout
-    logout_user
-    redirect_to home_url
+    if @daarmaan.is_used?
+      if User.current.logged?
+        logout_user
+        redirect_to @daarmaan.logout_url(request.referer)
+      else
+        redirect_to home_url
+      end
+    else
+      logout_user
+      redirect_to home_url
+    end
   end
 
   # Lets user choose a new password
