@@ -110,6 +110,11 @@ class AccountController < ApplicationController
 
   # User self-registration
   def register
+    if @daarmaan.is_used?
+
+      redirect_to @daarmaan.register_page 
+      return
+    end
     redirect_to(home_url) && return unless Setting.self_registration? || session[:auth_source_registration]
     if request.get?
       session[:auth_source_registration] = nil
