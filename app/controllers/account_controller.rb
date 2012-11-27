@@ -47,6 +47,7 @@ class AccountController < ApplicationController
     if @daarmaan.is_used?
       if User.current.logged?
         logout_user
+        session["redirected"] = true
         redirect_to @daarmaan.logout_url(request.referer)
       else
         redirect_to home_url
