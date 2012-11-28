@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift("/home/lxsameer/src/redmine/daarmaan/lib/")
+$LOAD_PATH.unshift("/home/lxsameer/src/nersi/daarmaan/lib/")
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
