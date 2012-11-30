@@ -70,7 +70,7 @@ module RedmineApp
     else
       raise Errno::ENOENT, "'authentication.yml' does not exists!"
     end
-    #config.middleware.delete(OpenIdAuthentication)
+
     config.middleware.use Daarmaan::AuthMiddleware
 
   end

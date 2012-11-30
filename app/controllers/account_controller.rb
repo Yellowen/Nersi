@@ -60,6 +60,7 @@ class AccountController < ApplicationController
 
   # Lets user choose a new password
   def lost_password
+    redirect_to home_url
     redirect_to(home_url) && return unless Setting.lost_password?
     if params[:token]
       @token = Token.find_by_action_and_value("recovery", params[:token].to_s)
@@ -155,6 +156,7 @@ class AccountController < ApplicationController
 
   # Token based account activation
   def activate
+    redirect_to home_url
     redirect_to(home_url) && return unless Setting.self_registration? && params[:token]
     token = Token.find_by_action_and_value('register', params[:token])
     redirect_to(home_url) && return unless token and !token.expired?

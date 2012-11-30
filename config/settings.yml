@@ -20,9 +20,9 @@
 # Settings can be defined through the application in Admin -> Settings
 
 app_title:
-  default: Redmine
+  default: Nersi
 app_subtitle:
-  default: Project management
+  default: Project management and support system
 welcome_text:
   default:
 login_required:

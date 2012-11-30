@@ -1,3 +1,3 @@
 * Generate a secret for encoding cookies in config/application.rb
 * Add some code to handle missing authentication configuration
-
+* Remove unnecessary urls from route.rb
