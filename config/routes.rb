@@ -61,6 +61,7 @@ RedmineApp::Application.routes.draw do
   match 'projects/:id/issues/report/:detail', :to => 'reports#issue_report_details', :via => :get
 
   match 'my/account', :controller => 'my', :action => 'account', :via => [:get, :post]
+  match 'my/change/information/', :controller => 'my', :action => 'change_information', :via => :get
   match 'my/account/destroy', :controller => 'my', :action => 'destroy', :via => [:get, :post]
   match 'my/page', :controller => 'my', :action => 'page', :via => :get
   match 'my', :controller => 'my', :action => 'index', :via => :get # Redirects to my/page

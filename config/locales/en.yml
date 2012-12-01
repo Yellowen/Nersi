@@ -522,6 +522,7 @@ en:
   label_enumeration_new: New value
   label_information: Information
   label_information_plural: Information
+  label_language: Language
   label_please_login: Please log in
   label_register: Register
   label_login_with_open_id_option: or login with OpenID
@@ -872,6 +873,7 @@ en:
   label_attribute_of_assigned_to: "Assignee's %{name}"
   label_attribute_of_fixed_version: "Target version's %{name}"
 
+  button_edit_information: Edit information
   button_login: Login
   button_submit: Submit
   button_save: Save

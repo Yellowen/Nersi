@@ -65,6 +65,15 @@ class MyController < ApplicationController
     end
   end
 
+  # Change basic information for Daarmaan
+  def change_information
+    if @daarmaan.is_used?
+      redirect_to @daarmaan.change_password
+    else
+      raise ActionController::RoutingError.new('Not Found')
+    end
+  end
+
   # Destroys user's account
   def destroy
     @user = User.current

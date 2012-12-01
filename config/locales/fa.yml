@@ -479,8 +479,9 @@ fa:
   label_custom_field_new: فیلد سفارشی تازه
   label_enumerations: برشمردنی‌ها
   label_enumeration_new: مقدار تازه
-  label_information: داده
-  label_information_plural: داده
+  label_information: اطلاعات
+  label_information_plural: اطلاعات
+  label_language: زبان
   label_please_login: وارد شوید
   label_register: نام نویسی کنید
   label_login_with_open_id_option: یا با OpenID وارد شوید
@@ -797,6 +798,7 @@ fa:
   label_principal_search: "جستجو برای کاربر یا دسته:"
   label_user_search: "جستجو برای کاربر:"
 
+  button_edit_information: ویرایش اطلاعات
   button_login: ورود
   button_submit: واگذاری
   button_save: نگهداری
