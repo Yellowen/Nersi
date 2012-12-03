@@ -76,7 +76,7 @@ class MyController < ApplicationController
   # Change basic information for Daarmaan
   def change_information
     if @daarmaan.is_used?
-      redirect_to @daarmaan.change_password
+      redirect_to @daarmaan.edit_information
     else
       raise ActionController::RoutingError.new('Not Found')
     end
@@ -102,6 +102,10 @@ class MyController < ApplicationController
 
   # Manage user's password
   def password
+    if @daarmaan.is_used?
+      redirect_to @daarmaan.change_password
+    end
+
     @user = User.current
     unless @user.change_password_allowed?
       flash[:error] = l(:notice_can_t_change_password)
