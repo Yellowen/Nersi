@@ -3,7 +3,7 @@
 <p><%=l(:field_login)%>: <strong><%= link_to_user(@user, :format => :username) %></strong><br />
 <%=l(:field_created_on)%>: <%= format_time(@user.created_on) %></p>
 
-<% if @user.own_account_deletable? and !@daarmaan.is_used? %>
+<% if @user.own_account_deletable? %>
   <p><%= link_to(l(:button_delete_my_account), {:action => 'destroy'}, :class => 'icon icon-del') %></p>
 <% end %>
 

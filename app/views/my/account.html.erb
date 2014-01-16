@@ -13,22 +13,10 @@
 <div class="splitcontentleft">
 <fieldset class="box tabular">
   <legend><%=l(:label_information_plural)%></legend>
-  <% if @daarmaan.is_used? %>
-  <p><label><%= t("First name") %>:</label> <%= @user.firstname %></p>
-  <p><label><%= t("Last name") %>:</label> <%= @user.lastname %></p>
-  <p><label><%= t("Email address") %>:</label> <%= @user.mail %></p>
-  <p><%= link_to(l(:button_edit_information), {:action => 'change_information'}, :class => 'icon icon-edit') %></p>
-  </fieldset>
-  <fieldset class="box tabular">
-    <legend><%=l(:label_language)%></legend>
-    <p><%= f.select :language, lang_options_for_select %></p>
-  </fieldset>
-  <% else %>
   <p><%= f.text_field :firstname, :required => true %></p>
   <p><%= f.text_field :lastname, :required => true %></p>
   <p><%= f.text_field :mail, :required => true %></p>
   <p><%= f.select :language, lang_options_for_select %></p>
-  <% end %>
   <% if Setting.openid? %>
   <p><%= f.text_field :identity_url  %></p>
   <% end %>

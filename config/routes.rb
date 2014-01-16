@@ -65,7 +65,7 @@ RedmineApp::Application.routes.draw do
   match 'my/account/destroy', :controller => 'my', :action => 'destroy', :via => [:get, :post]
   match 'my/page', :controller => 'my', :action => 'page', :via => :get
   match 'my', :controller => 'my', :action => 'index', :via => :get # Redirects to my/page
-  match 'my/dashboard', :controller => 'my', :action => 'dashboard', :via => :get # Redirects to dashboard page of daarmaan service
+  #match 'my/dashboard', :controller => 'my', :action => 'dashboard', :via => :get # Redirects to dashboard page of daarmaan service
   match 'my/reset_rss_key', :controller => 'my', :action => 'reset_rss_key', :via => :post
   match 'my/reset_api_key', :controller => 'my', :action => 'reset_api_key', :via => :post
   match 'my/password', :controller => 'my', :action => 'password', :via => [:get, :post]

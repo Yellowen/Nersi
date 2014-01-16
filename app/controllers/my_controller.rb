@@ -64,22 +64,14 @@ class MyController < ApplicationController
       end
     end
   end
-  
+
   # Redirect to dashboard page of Daarmaan service
   def dashboard
-    if @daarmaan.is_used?
-      redirect_to @daarmaan.dashboard
-    else
       redirect_to home
-    end
   end
   # Change basic information for Daarmaan
   def change_information
-    if @daarmaan.is_used?
-      redirect_to @daarmaan.edit_information
-    else
-      raise ActionController::RoutingError.new('Not Found')
-    end
+    raise ActionController::RoutingError.new('Not Found')
   end
 
   # Destroys user's account
@@ -102,9 +94,6 @@ class MyController < ApplicationController
 
   # Manage user's password
   def password
-    if @daarmaan.is_used?
-      redirect_to @daarmaan.change_password
-    end
 
     @user = User.current
     unless @user.change_password_allowed?

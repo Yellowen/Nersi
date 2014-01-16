@@ -24,19 +24,12 @@ class AccountController < ApplicationController
 
   # Login request and validation
   def login
-    if @daarmaan.is_used?
-      if User.current.logged?
-        redirect_to home_url
-      else
-        redirect_to @daarmaan.login_page(request.referer)
-      end
+    if request.get?
+      logout_user
     else
-      if request.get?
-        logout_user
-      else
-        authenticate_user
-      end
+      authenticate_user
     end
+
   rescue AuthSourceException => e
     logger.error "An error occured when authenticating #{params[:username]}: #{e.message}"
     render_error :message => e.message
@@ -44,18 +37,8 @@ class AccountController < ApplicationController
 
   # Log out current user and redirect to welcome page
   def logout
-    if @daarmaan.is_used?
-      if User.current.logged?
-        logout_user
-        session["redirected"] = true
-        redirect_to @daarmaan.logout_url(request.referer)
-      else
-        redirect_to home_url
-      end
-    else
-      logout_user
-      redirect_to home_url
-    end
+    logout_user
+    redirect_to home_url
   end
 
   # Lets user choose a new password
@@ -111,11 +94,6 @@ class AccountController < ApplicationController
 
   # User self-registration
   def register
-    if @daarmaan.is_used?
-
-      redirect_to @daarmaan.register_page 
-      return
-    end
     redirect_to(home_url) && return unless Setting.self_registration? || session[:auth_source_registration]
     if request.get?
       session[:auth_source_registration] = nil

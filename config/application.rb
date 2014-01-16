@@ -1,8 +1,8 @@
-$LOAD_PATH.unshift("/home/lxsameer/src/nersi/daarmaan/lib/")
+#$LOAD_PATH.unshift("/home/lxsameer/src/nersi/daarmaan/lib/")
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
-require 'daarmaan'
+#require 'daarmaan'
 
 
 if defined?(Bundler)

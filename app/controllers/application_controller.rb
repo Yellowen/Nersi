@@ -23,7 +23,7 @@ class Unauthorized < Exception; end
 
 class ApplicationController < ActionController::Base
   include Redmine::I18n
-  
+
   class_attribute :accept_api_auth_actions
   class_attribute :accept_rss_auth_actions
   class_attribute :model_object
@@ -51,11 +51,7 @@ class ApplicationController < ActionController::Base
       if session_expired? && !try_to_autologin
         reset_session
         flash[:error] = l(:error_session_expired)
-        if @daarmaan.is_used?
-          redirect_to @daarmaan.login_form
-        else
-          redirect_to signin_url
-        end
+        redirect_to signin_url
 
       else
         session[:atime] = Time.now.utc.to_i
@@ -96,7 +92,7 @@ class ApplicationController < ActionController::Base
   def find_current_user
     user = nil
     unless api_request?
-      if session[:user_id] 
+      if session[:user_id]
         # existing session
         user = (User.active.find(session[:user_id]) rescue nil)
 
@@ -189,11 +185,6 @@ class ApplicationController < ActionController::Base
         url = url_for(:controller => params[:controller], :action => params[:action], :id => params[:id], :project_id => params[:project_id])
       end
 
-      if @daarmaan.is_used?
-        # Path url as back_url
-        redirect_to @daarmaan.login_page(url)
-        return false
-      end
 
       respond_to do |format|
         format.html { redirect_to :controller => "account", :action => "login", :back_url => url }
