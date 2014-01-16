@@ -67,7 +67,7 @@ class MyController < ApplicationController
 
   # Redirect to dashboard page of Daarmaan service
   def dashboard
-      redirect_to home
+      redirect_to home_path
   end
   # Change basic information for Daarmaan
   def change_information
