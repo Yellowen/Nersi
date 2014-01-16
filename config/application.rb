@@ -73,7 +73,7 @@ module RedmineApp
       raise Errno::ENOENT, "'authentication.yml' does not exists!"
     end
 
-    config.middleware.use Daarmaan::AuthMiddleware
+    #config.middleware.use Daarmaan::AuthMiddleware
 
   end
 end
