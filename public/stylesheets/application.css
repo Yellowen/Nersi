@@ -33,7 +33,7 @@ h4 {border-bottom: 1px dotted #bbb;}
 
 #header h1 a.ancestor { font-size: 80%; }
 #quick-search {float:right;}
-#quick-search input {border: 1px solid #e8e8e8; Background: #292828; color: #eeeeec; padding: 5px; margin-left: 5px; font-size: 13px;}
+#quick-search input {border: 1px solid #e8e8e8; Background: white; color: #3f3f3f; padding: 5px; margin-left: 5px; font-size: 13px;}
 #quick-search input:focus {
     border-color: orange;
     box-shadow: 0 0 2px orange;
